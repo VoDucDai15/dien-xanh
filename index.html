@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trọ Xanh – Theo dõi điện nước</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eff0;--card:#fff;--ink:#12262b;--mute:#5d7378;--line:#d8e2e4;--e:#d98f00;--e-bg:#fff3d6;--w:#1a7fbf;--w-bg:#dff0fb;--ok:#238a5c;--ok-bg:#dcf3e8;--warn:#b86e00;--bad:#c93a28;--bad-bg:#fde4df;--shell:#12262b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1517;--card:#15262a;--ink:#e8f1f2;--mute:#8fa7ac;--line:#25393e;--e:#f2b134;--e-bg:#3a2d0c;--w:#4fb3ea;--w-bg:#0f2d40;--ok:#4cc794;--ok-bg:#12352a;--warn:#f2b134;--bad:#ff7a66;--bad-bg:#40191a;--shell:#000}}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;display:flex;justify-content:center;align-items:center}
+.phone{width:100%;max-width:400px;height:100%;max-height:780px;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media(min-width:520px){.phone{border:10px solid var(--shell);border-radius:38px;height:780px}}
+.top{padding:16px 18px 8px}.top h1{margin:0;font-size:20px;font-weight:800}.top p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+main{flex:1;overflow-y:auto;padding:4px 16px 16px}
+.s{display:none}.s.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+h2{font-size:15px;margin:0 0 8px;font-weight:700}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.odo{font-weight:800;font-size:30px;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.odo span{display:inline-block;background:var(--ink);color:var(--bg);border-radius:5px;padding:2px 5px;margin-right:2px}
+.lab{font-size:12px;color:var(--mute)}
+.e{color:var(--e)}.w{color:var(--w)}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;border-radius:6px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px}
+.ok{background:var(--ok-bg);color:var(--ok)}.warn{background:var(--e-bg);color:var(--warn)}.bad{background:var(--bad-bg);color:var(--bad)}
+button,input,select{font:inherit;color:inherit}
+.btn{width:100%;border:0;background:var(--ink);color:var(--bg);font-weight:700;padding:12px;border-radius:12px;cursor:pointer;margin-top:6px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:16px}
+label{font-size:13px;font-weight:500;display:block;margin:10px 0 4px}
+.seg{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.seg button{border:1px solid var(--line);background:var(--card);padding:7px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;font-size:13px}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chart{display:flex;align-items:flex-end;gap:8px;height:150px;position:relative;padding-top:6px}
+.chart .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--mute)}
+.chart .c i{width:100%;border-radius:6px 6px 0 0;margin-bottom:4px}
+.chart .c b{font-size:11px;color:var(--ink)}
+.limit{position:absolute;left:0;right:0;border-top:2px dashed var(--bad);font-size:10px;color:var(--bad)}
+.item{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);background:var(--card);border-radius:14px;margin-bottom:8px;cursor:pointer;width:100%;text-align:left}
+.item .ic{font-size:26px;width:44px;height:44px;border-radius:12px;background:var(--e-bg);display:grid;place-items:center}
+.item small{display:block;color:var(--mute);font-size:12px}
+.tip{padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.tip:last-child{border:0}
+.back{border:0;background:none;color:var(--mute);cursor:pointer;padding:0 0 8px;font-size:13px}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card)}
+nav button{flex:1;border:0;background:none;padding:9px 0 10px;font-size:11px;color:var(--mute);cursor:pointer}
+nav button b{display:block;font-size:19px;font-weight:400}
+nav button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 3px var(--e)}
+.toast{position:absolute;left:16px;right:16px;bottom:74px;background:var(--ink);color:var(--bg);padding:11px 14px;border-radius:12px;font-size:13px;display:none}
+.toast.on{display:block}
+.note{font-size:12px;color:var(--mute);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="phone">
+ <div class="top"><h1 id="ttl">Trọ Xanh</h1><p id="sub">Phòng 204 · Tháng 10</p></div>
+ <main>
+  <!-- 1 Trang chủ -->
+  <section class="s on" id="home">
+   <div class="card"><h2 class="e">⚡ Điện tháng này</h2><div class="odo" id="odoE"></div>
+    <div class="bar"><i id="barE"></i></div><div class="lab" id="txtE"></div></div>
+   <div class="card"><h2 class="w">💧 Nước tháng này</h2><div class="odo" id="odoW"></div>
+    <div class="bar"><i id="barW"></i></div><div class="lab" id="txtW"></div></div>
+   <div class="card"><div class="lab">Tạm tính hóa đơn</div><div class="odo" style="letter-spacing:0" id="bill"></div>
+    <div id="stat" style="margin-top:8px"></div></div>
+   <div class="row"><button class="btn" onclick="go('log')">Ghi chỉ số</button><button class="btn ghost" onclick="go('tips')">Xem mẹo</button></div>
+  </section>
+  <!-- 2 Ghi chỉ số -->
+  <section class="s" id="log">
+   <div class="card"><h2>Ghi chỉ số hôm nay</h2>
+    <label>Số điện trên đồng hồ (kWh)</label><input id="inE" type="number" inputmode="numeric">
+    <label>Số nước trên đồng hồ (m³)</label><input id="inW" type="number" inputmode="numeric">
+    <div class="note" id="prevTxt"></div>
+    <button class="btn" onclick="save()">Lưu chỉ số</button></div>
+   <div class="card"><h2>Mới ghi gần đây</h2><div id="hist"></div></div>
+  </section>
+  <!-- 3 Thống kê -->
+  <section class="s" id="stats">
+   <div class="seg"><button class="on" id="tE" onclick="chart('e')">⚡ Điện</button><button id="tW" onclick="chart('w')">💧 Nước</button></div>
+   <div class="card"><h2 id="chT"></h2><div class="chart" id="chart"></div></div>
+   <div class="card"><h2>Điện đi đâu mất? (ước tính)</h2><div id="split"></div>
+    <div class="note">Ước tính dựa trên thiết bị phổ biến trong phòng trọ. Không thay thế đồng hồ đo riêng từng thiết bị.</div></div>
+  </section>
+  <!-- 4 Cảnh báo -->
+  <section class="s" id="alert">
+   <div class="card" id="alBox"></div>
+   <div class="card"><h2>Đặt mức tối đa mỗi tháng</h2>
+    <label>Điện (kWh)</label><input id="limE" type="number" inputmode="numeric">
+    <label>Nước (m³)</label><input id="limW" type="number" inputmode="numeric">
+    <label>Báo khi dùng đến</label><select id="pct"><option value="0.7">70% mức tối đa</option><option value="0.8" selected>80% mức tối đa</option><option value="0.9">90% mức tối đa</option></select>
+    <button class="btn" onclick="setLim()">Lưu mức cảnh báo</button></div>
+  </section>
+  <!-- 5 Mẹo -->
+  <section class="s" id="tips"><div id="devs"></div></section>
+  <!-- 6 Chi tiết -->
+  <section class="s" id="dev"><button class="back" onclick="go('tips')">← Tất cả thiết bị</button><div class="card" id="devBox"></div></section>
+ </main>
+ <div class="toast" id="toast"></div>
+ <nav id="nav">
+  <button class="on" data-t="home" onclick="go('home')"><b>⌂</b>Trang chủ</button>
+  <button data-t="log" onclick="go('log')"><b>✎</b>Ghi số</button>
+  <button data-t="stats" onclick="go('stats')"><b>▥</b>Thống kê</button>
+  <button data-t="alert" onclick="go('alert')"><b>🔔</b>Cảnh báo</button>
+  <button data-t="tips" onclick="go('tips')"><b>💡</b>Mẹo</button>
+ </nav>
+</div>
+<script>
+var S={pE:1250,pW:84,cE:1392,cW:94,limE:120,limW:8,pct:.8,pe:3500,pw:15000,log:[["24/10",1392,94],["17/10",1351,91],["10/10",1308,88]],mode:'e'};
+var M=["T5","T6","T7","T8","T9","T10"],HE=[88,95,102,118,131,0],HW=[6,6,7,7,9,0];
+var D=[
+ {n:"Điều hòa",i:"❄️",p:45,s:"Tiết kiệm 20–30 kWh/tháng",t:["Đặt 26–27°C thay vì 22–24°C. Mỗi độ tăng giúp giảm khoảng 3–5% điện.","Dùng chế độ hẹn giờ tắt sau khi ngủ 2–3 giờ.","Vệ sinh lưới lọc mỗi tháng để máy không chạy gắng sức.","Đóng cửa và kéo rèm khi bật máy."]},
+ {n:"Bình nóng lạnh",i:"🚿",p:20,s:"Tiết kiệm 10–15 kWh/tháng",t:["Chỉ bật bình 15–20 phút trước khi tắm rồi rút điện.","Tắm chung giờ với bạn cùng phòng để bình không phải đun lại.","Đặt nhiệt độ vừa đủ ấm, không cần chỉnh quá cao.","Tắt vòi khi xà phòng, đỡ tốn cả nước lẫn điện."]},
+ {n:"Tủ lạnh",i:"🧊",p:12,s:"Tiết kiệm 5–8 kWh/tháng",t:["Không nhét quá đầy và để cách tường vài cm cho thoát nhiệt.","Để thức ăn nguội hẳn trước khi cho vào tủ.","Mở cửa nhanh, ít lần.","Kiểm tra gioăng cửa còn kín không."]},
+ {n:"Quạt, đèn, sạc",i:"💡",p:13,s:"Tiết kiệm 5–10 kWh/tháng",t:["Thay bóng sợi đốt bằng đèn LED.","Rút sạc và ổ cắm khi không dùng.","Tắt đèn, quạt khi ra khỏi phòng.","Dùng ổ cắm có công tắc để tắt cả cụm thiết bị một lần."]},
+ {n:"Nước sinh hoạt",i:"💧",p:10,s:"Tiết kiệm 1–2 m³/tháng",t:["Sửa ngay vòi nhỏ giọt, vòi rò rỉ có thể hao vài m³ mỗi tháng.","Giặt đồ khi đủ mẻ, tránh giặt lẻ.","Dùng thau hứng nước rửa rau để xả bồn cầu hoặc lau nhà.","Đánh răng bằng cốc, không để vòi chảy."]}];
+var $=function(i){return document.getElementById(i)};
+var fmt=function(n){return n.toLocaleString("vi-VN")};
+function odo(v,d){return String(v).padStart(d,"0").split("").map(function(c){return "<span>"+c+"</span>"}).join("")}
+function use(){return{e:S.cE-S.pE,w:S.cW-S.pW}}
+function lvl(u,l){var r=u/l;return r>=1?["bad","Đã vượt mức"]:r>=S.pct?["warn","Sắp chạm mức"]:["ok","Trong mức an toàn"]}
+function col(l){return l[0]=="bad"?"var(--bad)":l[0]=="warn"?"var(--e)":"var(--ok)"}
+function render(){
+ var u=use(),le=lvl(u.e,S.limE),lw=lvl(u.w,S.limW);
+ $("odoE").innerHTML=odo(S.cE,5);$("odoW").innerHTML=odo(S.cW,4);
+ $("barE").style.cssText="width:"+Math.min(100,u.e/S.limE*100)+"%;background:"+col(le);
+ $("barW").style.cssText="width:"+Math.min(100,u.w/S.limW*100)+"%;background:"+col(lw);
+ $("txtE").innerHTML="Đã dùng <b>"+u.e+" kWh</b> / mức "+S.limE+" · <span class='pill "+le[0]+"'>"+le[1]+"</span>";
+ $("txtW").innerHTML="Đã dùng <b>"+u.w+" m³</b> / mức "+S.limW+" · <span class='pill "+lw[0]+"'>"+lw[1]+"</span>";
+ var bE=u.e*S.pe,bW=u.w*S.pw;
+ $("bill").textContent=fmt(bE+bW)+"đ";
+ $("stat").innerHTML="Điện "+fmt(bE)+"đ · Nước "+fmt(bW)+"đ<div class='note'>Giá tạm tính: điện 3.500đ/kWh, nước 15.000đ/m³. Hãy sửa theo giá chủ trọ áp dụng.</div>";
+ $("prevTxt").textContent="Chỉ số chốt tháng trước: điện "+S.pE+", nước "+S.pW+". Chỉ số mới phải lớn hơn số đang có ("+S.cE+" / "+S.cW+").";
+ $("hist").innerHTML=S.log.map(function(r){return "<div class='tip'><b>"+r[0]+"</b> · điện "+r[1]+" · nước "+r[2]+"</div>"}).join("");
+ $("limE").value=S.limE;$("limW").value=S.limW;
+ var worst=(le[0]=="bad"||lw[0]=="bad")?"bad":(le[0]=="warn"||lw[0]=="warn")?"warn":"ok";
+ var msg={bad:"Bạn đã vượt mức tháng này. Xem mẹo cho thiết bị tốn điện nhất để giảm bớt.",warn:"Còn ít dư địa. Giữ nhịp này, bạn sẽ chạm mức trước cuối tháng.",ok:"Bạn đang dùng ổn. Cứ giữ thói quen hiện tại."}[worst];
+ var left=Math.max(0,S.limE-u.e);
+ $("alBox").innerHTML="<h2>"+(worst=="bad"?"🔴":worst=="warn"?"🟠":"🟢")+" Tình trạng tháng này</h2><p style='margin:0 0 8px;font-size:14px'>"+msg+"</p><div class='lab'>Điện: "+u.e+"/"+S.limE+" kWh ("+(le[0]=="bad"?"vượt "+(u.e-S.limE)+" kWh":"còn "+left+" kWh")+")<br>Nước: "+u.w+"/"+S.limW+" m³</div><button class='btn' onclick=\"go('tips')\">Xem mẹo tiết kiệm</button>";
+ chart(S.mode);
+}
+function chart(m){
+ S.mode=m;$("tE").className=m=="e"?"on":"";$("tW").className=m=="w"?"on":"";
+ var u=use(),H=(m=="e"?HE:HW).slice(),lim=m=="e"?S.limE:S.limW;H[5]=m=="e"?u.e:u.w;
+ var mx=Math.max.apply(null,H.concat(lim))*1.15,c=m=="e"?"var(--e)":"var(--w)";
+ $("chT").textContent=(m=="e"?"Điện (kWh)":"Nước (m³)")+" 6 tháng gần đây";
+ $("chart").innerHTML=H.map(function(v,i){return "<div class='c'><b>"+v+"</b><i style='height:"+(v/mx*100)+"%;background:"+(i==5&&v>lim?"var(--bad)":c)+";opacity:"+(i==5?1:.55)+"'></i>"+M[i]+"</div>"}).join("")+"<div class='limit' style='bottom:calc("+(lim/mx*100)+"% * .85 + 22px)'>mức tối đa "+lim+"</div>";
+ $("split").innerHTML=D.slice(0,4).map(function(d){return "<div style='margin-bottom:8px'><div class='lab'>"+d.i+" "+d.n+" · "+d.p+"%</div><div class='bar'><i style='width:"+d.p*2+"%;background:var(--e)'></i></div></div>"}).join("");
+}
+function go(t){
+ document.querySelectorAll(".s").forEach(function(s){s.classList.remove("on")});$(t).classList.add("on");
+ var nt=t=="dev"?"tips":t;document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.t==nt)});
+ var T={home:["Trọ Xanh","Phòng 204 · Tháng 10"],log:["Ghi chỉ số","Chụp đồng hồ rồi nhập số vào đây"],stats:["Thống kê","Xem điện nước thay đổi thế nào"],alert:["Cảnh báo","Nhận nhắc trước khi vượt mức"],tips:["Mẹo theo thiết bị","Chọn thiết bị bạn đang dùng"],dev:["Chi tiết thiết bị","Mẹo dễ làm ngay hôm nay"]}[t];
+ $("ttl").textContent=T[0];$("sub").textContent=T[1];document.querySelector("main").scrollTop=0;
+}
+function toast(m){var t=$("toast");t.textContent=m;t.className="toast on";setTimeout(function(){t.className="toast"},2400)}
+function save(){
+ var e=+$("inE").value,w=+$("inW").value;
+ if(!e||!w){toast("Hãy nhập cả số điện và số nước.");return}
+ if(e<S.cE||w<S.cW){toast("Số mới phải lớn hơn hoặc bằng số đã ghi.");return}
+ S.cE=e;S.cW=w;S.log.unshift(["Hôm nay",e,w]);S.log=S.log.slice(0,5);$("inE").value="";$("inW").value="";render();
+ var u=use();toast("Đã lưu chỉ số. Điện tháng này: "+u.e+" kWh.");go("home");
+}
+function setLim(){
+ var e=+$("limE").value,w=+$("limW").value;if(!e||!w){toast("Hãy nhập cả hai mức tối đa.");return}
+ S.limE=e;S.limW=w;S.pct=+$("pct").value;render();toast("Đã lưu mức cảnh báo.");
+}
+$("devs").innerHTML=D.map(function(d,i){return "<button class='item' onclick='dev("+i+")'><div class='ic'>"+d.i+"</div><div><b>"+d.n+"</b><small>Chiếm khoảng "+d.p+"% · "+d.s+"</small></div></button>"}).join("");
+function dev(i){var d=D[i];$("devBox").innerHTML="<h2>"+d.i+" "+d.n+"</h2><span class='pill ok'>"+d.s+"</span><div style='margin-top:8px'>"+d.t.map(function(t){return "<div class='tip'>"+t+"</div>"}).join("")+"</div><div class='note'>Con số tiết kiệm là ước tính tham khảo, tùy thiết bị và thói quen mỗi người.</div>";go("dev")}
+render();
+</script>
+</body>
+</html>
