@@ -66,6 +66,7 @@ nav button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 3px var(--e)}
    <div class="card"><div class="lab">Tạm tính hóa đơn</div><div class="odo" style="letter-spacing:0" id="bill"></div>
     <div id="stat" style="margin-top:8px"></div></div>
    <div class="row"><button class="btn" onclick="go('log')">Ghi chỉ số</button><button class="btn ghost" onclick="go('tips')">Xem mẹo</button></div>
+   <div class="row" style="margin-top:8px"><button class="btn ghost" onclick="go('share')">👥 Chia tiền phòng</button><button class="btn ghost" onclick="go('chal')">🏅 Thử thách</button></div>
   </section>
   <!-- 2 Ghi chỉ số -->
   <section class="s" id="log">
@@ -91,6 +92,15 @@ nav button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 3px var(--e)}
     <label>Nước (m³)</label><input id="limW" type="number" inputmode="numeric">
     <label>Báo khi dùng đến</label><select id="pct"><option value="0.7">70% mức tối đa</option><option value="0.8" selected>80% mức tối đa</option><option value="0.9">90% mức tối đa</option></select>
     <button class="btn" onclick="setLim()">Lưu mức cảnh báo</button></div>
+  </section>
+  <section class="s" id="share">
+   <div class="card"><h2>Tổng tiền tháng này</h2><div class="odo" style="letter-spacing:0" id="shTot"></div><div class="note">Lấy từ chỉ số điện nước đã ghi, chia theo số ngày ở của mỗi bạn.</div></div>
+   <div class="card"><h2>Các bạn cùng phòng</h2><div id="mem"></div><div class="row" style="margin-top:8px"><input id="newN" placeholder="Tên bạn mới"><button class="btn ghost" style="margin:0;flex:0 0 90px" onclick="addM()">Thêm</button></div></div>
+   <div class="card"><h2>Tin nhắn gửi nhóm</h2><pre id="msg" style="white-space:pre-wrap;font:inherit;font-size:13px;margin:0 0 6px"></pre><button class="btn" onclick="cp()">Sao chép tin nhắn</button></div>
+  </section>
+  <section class="s" id="chal">
+   <div class="card"><h2>🏅 <span id="bdg"></span></h2><div class="bar"><i id="chBar" style="background:var(--ok)"></i></div><div class="lab" id="chTxt"></div></div>
+   <div class="card"><h2>Thử thách hôm nay</h2><div id="chList"></div><div class="note" id="chSave"></div></div>
   </section>
   <!-- 5 Mẹo -->
   <section class="s" id="tips"><div id="devs"></div></section>
@@ -130,7 +140,7 @@ function render(){
  $("txtW").innerHTML="Đã dùng <b>"+u.w+" m³</b> / mức "+S.limW+" · <span class='pill "+lw[0]+"'>"+lw[1]+"</span>";
  var bE=u.e*S.pe,bW=u.w*S.pw;
  $("bill").textContent=fmt(bE+bW)+"đ";
- $("stat").innerHTML="Điện "+fmt(bE)+"đ · Nước "+fmt(bW)+"đ<div class='note'>Giá tạm tính: điện 3.500đ/kWh, nước 15.000đ/m³. Hãy sửa theo giá chủ trọ áp dụng.</div>";
+ var fe=Math.round(u.e/24*30);$("stat").innerHTML="Điện "+fmt(bE)+"đ · Nước "+fmt(bW)+"đ<div class='note' style='color:var(--ink)'>Dự báo cuối tháng: khoảng "+fe+" kWh"+(fe>S.limE?" (sẽ vượt mức)":" (trong mức)")+"</div><div class='note'>Giá tạm tính: điện 3.500đ/kWh, nước 15.000đ/m³. Hãy sửa theo giá chủ trọ áp dụng.</div>";
  $("prevTxt").textContent="Chỉ số chốt tháng trước: điện "+S.pE+", nước "+S.pW+". Chỉ số mới phải lớn hơn số đang có ("+S.cE+" / "+S.cW+").";
  $("hist").innerHTML=S.log.map(function(r){return "<div class='tip'><b>"+r[0]+"</b> · điện "+r[1]+" · nước "+r[2]+"</div>"}).join("");
  $("limE").value=S.limE;$("limW").value=S.limW;
@@ -138,7 +148,7 @@ function render(){
  var msg={bad:"Bạn đã vượt mức tháng này. Xem mẹo cho thiết bị tốn điện nhất để giảm bớt.",warn:"Còn ít dư địa. Giữ nhịp này, bạn sẽ chạm mức trước cuối tháng.",ok:"Bạn đang dùng ổn. Cứ giữ thói quen hiện tại."}[worst];
  var left=Math.max(0,S.limE-u.e);
  $("alBox").innerHTML="<h2>"+(worst=="bad"?"🔴":worst=="warn"?"🟠":"🟢")+" Tình trạng tháng này</h2><p style='margin:0 0 8px;font-size:14px'>"+msg+"</p><div class='lab'>Điện: "+u.e+"/"+S.limE+" kWh ("+(le[0]=="bad"?"vượt "+(u.e-S.limE)+" kWh":"còn "+left+" kWh")+")<br>Nước: "+u.w+"/"+S.limW+" m³</div><button class='btn' onclick=\"go('tips')\">Xem mẹo tiết kiệm</button>";
- chart(S.mode);
+ chart(S.mode);rs();rc();
 }
 function chart(m){
  S.mode=m;$("tE").className=m=="e"?"on":"";$("tW").className=m=="w"?"on":"";
@@ -150,8 +160,8 @@ function chart(m){
 }
 function go(t){
  document.querySelectorAll(".s").forEach(function(s){s.classList.remove("on")});$(t).classList.add("on");
- var nt=t=="dev"?"tips":t;document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.t==nt)});
- var T={home:["Trọ Xanh","Phòng 204 · Tháng 10"],log:["Ghi chỉ số","Chụp đồng hồ rồi nhập số vào đây"],stats:["Thống kê","Xem điện nước thay đổi thế nào"],alert:["Cảnh báo","Nhận nhắc trước khi vượt mức"],tips:["Mẹo theo thiết bị","Chọn thiết bị bạn đang dùng"],dev:["Chi tiết thiết bị","Mẹo dễ làm ngay hôm nay"]}[t];
+ var nt=t=="dev"?"tips":(t=="share"||t=="chal")?"home":t;document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.t==nt)});
+ var T={home:["Trọ Xanh","Phòng 204 · Tháng 10"],log:["Ghi chỉ số","Chụp đồng hồ rồi nhập số vào đây"],stats:["Thống kê","Xem điện nước thay đổi thế nào"],alert:["Cảnh báo","Nhận nhắc trước khi vượt mức"],tips:["Mẹo theo thiết bị","Chọn thiết bị bạn đang dùng"],dev:["Chi tiết thiết bị","Mẹo dễ làm ngay hôm nay"],share:["Chia tiền phòng","Mỗi bạn trả bao nhiêu, rõ ràng"],chal:["Thử thách xanh","Làm mỗi ngày, lên cấp mỗi tuần"]}[t];
  $("ttl").textContent=T[0];$("sub").textContent=T[1];document.querySelector("main").scrollTop=0;
 }
 function toast(m){var t=$("toast");t.textContent=m;t.className="toast on";setTimeout(function(){t.className="toast"},2400)}
@@ -168,6 +178,24 @@ function setLim(){
 }
 $("devs").innerHTML=D.map(function(d,i){return "<button class='item' onclick='dev("+i+")'><div class='ic'>"+d.i+"</div><div><b>"+d.n+"</b><small>Chiếm khoảng "+d.p+"% · "+d.s+"</small></div></button>"}).join("");
 function dev(i){var d=D[i];$("devBox").innerHTML="<h2>"+d.i+" "+d.n+"</h2><span class='pill ok'>"+d.s+"</span><div style='margin-top:8px'>"+d.t.map(function(t){return "<div class='tip'>"+t+"</div>"}).join("")+"</div><div class='note'>Con số tiết kiệm là ước tính tham khảo, tùy thiết bị và thói quen mỗi người.</div>";go("dev")}
+S.mem=[{n:"Lan",d:30},{n:"Hà",d:30},{n:"Mai",d:20}];S.ch=[true,false,false,false,false];
+var CH=[["Tắt điều hòa sớm 1 giờ",84000],["Rút sạc khi pin đầy",10000],["Tắm trong 5 phút",35000],["Tắt đèn, quạt khi ra khỏi phòng",15000],["Đóng vòi khi đánh răng",20000]];
+var LV=[[0,"Người mới xanh"],[90,"Tiết kiệm chăm chỉ"],[120,"Chiến binh xanh"]];
+function rs(){var u=use(),T=u.e*S.pe+u.w*S.pw,sd=S.mem.reduce(function(a,m){return a+m.d},0)||1,sh=function(m){return fmt(Math.round(T*m.d/sd/1000)*1000)+"đ"};
+ $("shTot").textContent=fmt(T)+"đ";
+ $("mem").innerHTML=S.mem.map(function(m,i){return "<div class='tip' style='display:flex;gap:8px;align-items:center'><b style='flex:1'>"+m.n+"</b><input type='number' value='"+m.d+"' min='1' max='31' style='width:64px;padding:6px' onchange='setD("+i+",this.value)'><span class='lab'>ngày</span><b style='width:84px;text-align:right'>"+sh(m)+"</b><button class='back' style='padding:0' onclick='delM("+i+")'>✕</button></div>"}).join("");
+ $("msg").textContent="Tiền điện nước phòng 204 tháng 10: "+fmt(T)+"đ.\n"+S.mem.map(function(m){return m.n+": "+sh(m)}).join("\n")+"\nChia theo số ngày ở. Các bạn chuyển khoản giúp mình nhé!"}
+function setD(i,v){S.mem[i].d=Math.max(1,Math.min(31,+v||1));rs()}
+function delM(i){if(S.mem.length>1){S.mem.splice(i,1);rs()}else toast("Cần ít nhất 1 người.")}
+function addM(){var n=$("newN").value.replace(/[<>&"']/g,"").trim();if(!n){toast("Hãy nhập tên bạn mới.");return}if(S.mem.length>=8){toast("Tối đa 8 người.");return}S.mem.push({n:n,d:30});$("newN").value="";rs()}
+function cp(){var f=function(){toast("Không sao chép được, hãy chọn và chép thủ công.")};try{navigator.clipboard.writeText($("msg").textContent).then(function(){toast("Đã sao chép tin nhắn.")},f)}catch(e){f()}}
+function rc(){var n=S.ch.filter(Boolean).length,p=80+n*10,i=0;LV.forEach(function(l,k){if(p>=l[0])i=k});var nx=LV[i+1];
+ $("bdg").textContent=LV[i][1]+" · "+p+" điểm";$("chBar").style.width=(nx?p/nx[0]*100:100)+"%";
+ $("chTxt").textContent=nx?"Còn "+(nx[0]-p)+" điểm để lên cấp "+nx[1]:"Bạn đã đạt cấp cao nhất. Giữ vững nhé!";
+ $("chList").innerHTML=CH.map(function(c,k){return "<button class='item' onclick='tg("+k+")'><div class='ic' style='background:"+(S.ch[k]?"var(--ok-bg)":"var(--e-bg)")+"'>"+(S.ch[k]?"✅":"⬜")+"</div><div><b>"+c[0]+"</b><small>Ước tính tiết kiệm "+fmt(c[1])+"đ/tháng nếu giữ đều</small></div></button>"}).join("");
+ var sv=CH.reduce(function(a,c,k){return a+(S.ch[k]?c[1]:0)},0);
+ $("chSave").textContent="Nếu duy trì các việc đã làm, bạn có thể giảm khoảng "+fmt(sv)+"đ mỗi tháng. Số tiền chỉ là ước tính tham khảo."}
+function tg(k){S.ch[k]=!S.ch[k];rc();if(S.ch[k])toast("+10 điểm! Làm tốt lắm.")}
 render();
 </script>
 </body>
